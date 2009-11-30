@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.2
+// @version        0.0.3
 // ==/UserScript==
 (function() {
     // Select utility
@@ -11,7 +11,10 @@
         { name: 'wideTsubuyaki', args: {} },
 
         // 画像を大きく表示
-        { name: 'wideImage', args: { maxSize: '300px' } },
+        { name: 'wideImage', args: { maxSize: '300px', bgcolor: 'white' } },
+        // 画像の透過をそのままにしておく場合は、上記からbgcolorの指定を消して、
+        // { name: 'wideImage', args: { maxSize: '300px' } },
+        // のようにしてください
     ];
 
     function xpath( context, query ) {
@@ -82,6 +85,7 @@
             img.src = url;
             img.style.maxWidth  = args.maxSize;
             img.style.maxHeight = args.maxSize;
+            if( args.bgcolor ) img.style.backgroundColor = args.bgcolor;
         }
     };
 
