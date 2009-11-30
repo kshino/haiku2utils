@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.3
+// @version        0.0.4
 // ==/UserScript==
 (function() {
     // Select utility
@@ -15,6 +15,9 @@
         // 画像の透過をそのままにしておく場合は、上記からbgcolorの指定を消して、
         // { name: 'wideImage', args: { maxSize: '300px' } },
         // のようにしてください
+        
+        // ナビゲーション部の固定表示
+        { name: 'fixedNavigation', args: {} },
     ];
 
     function xpath( context, query ) {
@@ -87,6 +90,17 @@
             img.style.maxHeight = args.maxSize;
             if( args.bgcolor ) img.style.backgroundColor = args.bgcolor;
         }
+    };
+
+    utils.fixedNavigation = function ( args ) {
+        var footer = document.getElementById( 'footer' );
+        footer.style.width    = '100%';
+        footer.style.height   = '20px';
+        footer.style.position = 'fixed';
+        footer.style.bottom   = '-5px';
+        footer.style.backgroundColor = 'white';
+        
+        document.getElementsByTagName( 'body' )[0].style.paddingBottom = '20px';
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
