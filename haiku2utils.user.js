@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.4
+// @version        0.0.5
 // ==/UserScript==
 (function() {
     // Select utility
@@ -15,7 +15,7 @@
         // 画像の透過をそのままにしておく場合は、上記からbgcolorの指定を消して、
         // { name: 'wideImage', args: { maxSize: '300px' } },
         // のようにしてください
-        
+
         // ナビゲーション部の固定表示
         { name: 'fixedNavigation', args: {} },
     ];
@@ -65,15 +65,16 @@
     var utils = {};
 
     utils.wideTsubuyaki = function ( args ) {
-        var inputs = xpath( document.body, '//form[@action="/"]//input[@name="body"]' );
-        if( inputs.length != 1 ) return;
+        var inputs = xpath( document.body, '//input[@name="body"]' );
 
-        var input = inputs[0];
+        for( var i = 0; i < inputs.length; ++i ) {
+            var input = inputs[i];
 
-        input.size = undefined;
-        input.style.width        = '90%';
-        input.style.display      = 'block';
-        input.style.marginBottom = '5px';
+            input.size = undefined;
+            input.style.width        = '90%';
+            input.style.display      = 'block';
+            input.style.marginBottom = '5px';
+        }
     };
 
     utils.wideImage = function ( args ) {
@@ -99,7 +100,7 @@
         footer.style.position = 'fixed';
         footer.style.bottom   = '-5px';
         footer.style.backgroundColor = 'white';
-        
+
         document.getElementsByTagName( 'body' )[0].style.paddingBottom = '20px';
     };
 
