@@ -2,14 +2,14 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.1
+// @version        0.0.2
 // ==/UserScript==
 (function() {
     // Select utility
     var runUtils = [
         // つぶやき欄の拡張
         { name: 'wideTsubuyaki', args: {} },
-        
+
         // 画像を大きく表示
         { name: 'wideImage', args: { maxSize: '300px' } },
     ];
@@ -55,32 +55,36 @@
 
         return hash;
     }
-    
+
     var utils = {};
 
     utils.wideTsubuyaki = function ( args ) {
         var inputs = xpath( document.body, '//form[@action="/"]//input[@name="body"]' );
         if( inputs.length != 1 ) return;
-        
+
         var input = inputs[0];
-            
+
         input.size = undefined;
         input.style.width        = '90%';
         input.style.display      = 'block';
         input.style.marginBottom = '5px';
     };
-    
+
     utils.wideImage = function ( args ) {
-        var imgs = xpath( document.body, '//td[@class="entry"]//center[@class="photo"]//img' );
+        var imgs = xpath( document.body, '//td[@class="entry"]//img[@alt="photo"]' );
         for( var i = 0; i < imgs.length; ++i ) {
             var img = imgs[i];
             var params = parseQueryParam( img.src );
-            img.src = params.url;
+            var url    = params == null ? img.src: params.url;
+            if( url.match( /^(http:\/\/(?:img\.)?f\.hatena\.ne\.jp\/images\/.+)_\d+(\.(?:jpg|gif|png))/ ) ) {
+                url = RegExp.$1 + RegExp.$2;
+            }
+            img.src = url;
             img.style.maxWidth  = args.maxSize;
             img.style.maxHeight = args.maxSize;
         }
     };
-    
+
     for( var i = 0; i < runUtils.length; ++i ) {
         var target = runUtils[i];
         utils[ target.name ]( target.args );
