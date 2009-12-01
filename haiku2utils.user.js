@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.5
+// @version        0.0.6
 // ==/UserScript==
 (function() {
     // Select utility
@@ -18,7 +18,12 @@
 
         // ナビゲーション部の固定表示
         { name: 'fixedNavigation', args: {} },
+
+        // ニックネームの後にIDを表示
+        { name: 'showID', args: {} },
     ];
+
+    const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
 
     function xpath( context, query ) {
         var items = document.evaluate(
@@ -84,7 +89,7 @@
             var params = parseQueryParam( img.src );
             var url    = params == null ? img.src: params.url;
             if( url.match( /^(http:\/\/(?:img\.)?f\.hatena\.ne\.jp\/images\/.+)_\d+(\.(?:jpg|gif|png))/ ) ) {
-                url = RegExp.$1 + RegExp.$2;
+//                url = RegExp.$1 + RegExp.$2;
             }
             img.src = url;
             img.style.maxWidth  = args.maxSize;
@@ -102,6 +107,17 @@
         footer.style.backgroundColor = 'white';
 
         document.getElementsByTagName( 'body' )[0].style.paddingBottom = '20px';
+    };
+
+    utils.showID = function ( args ) {
+        var entries = xpath( document.body, '//td[@class="entry"]' );
+        var id_regexp = new RegExp( '/(' + ID_REGEXP + ')/$' );
+        for( var i = 0; i < entries.length; ++i ) {
+            var a = entries[i].firstChild;
+            if( a.href.match( id_regexp ) ) {
+                a.innerHTML += ' (id:' + RegExp.$1 + ')';
+            }
+        }
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
