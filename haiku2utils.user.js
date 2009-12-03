@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.6
+// @version        0.0.7
 // ==/UserScript==
 (function() {
     // Select utility
@@ -75,10 +75,15 @@
         for( var i = 0; i < inputs.length; ++i ) {
             var input = inputs[i];
 
-            input.size = undefined;
-            input.style.width        = '90%';
-            input.style.display      = 'block';
-            input.style.marginBottom = '5px';
+            var tarea = document.createElement( 'textarea' );
+            tarea.name = 'body';
+            tarea.style.width        = '60%';
+            tarea.style.height       = '70px';
+            tarea.style.padding      = '3px';
+            tarea.style.display      = 'block';
+            tarea.style.marginBottom = '5px';
+            
+            input.form.replaceChild( tarea, input );
         }
     };
 
