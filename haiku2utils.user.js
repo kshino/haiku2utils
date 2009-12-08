@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.9
+// @version        0.0.9.1
 // ==/UserScript==
 (function() {
     // Select utility
@@ -239,6 +239,8 @@
         resizeCanvas( args.defaultWidth, args.defaultHeight );
 
         var panel       = document.getElementById( 'panel' );
+        if( panel == null ) return;
+
         var resizer     = createElement( 'p' );
         var width       = args.defaultWidth;
         var height      = args.defaultHeight;
