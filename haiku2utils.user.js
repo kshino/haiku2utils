@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.7
+// @version        0.0.8
 // ==/UserScript==
 (function() {
     // Select utility
@@ -21,6 +21,15 @@
 
         // ニックネームの後にIDを表示
         { name: 'showID', args: {} },
+
+        // つぶやき投稿時等にSubmitボタンを無効にする
+        { name: 'disableSubmitButtonOnClick', args: {} },
+
+        // ペンサイズ追加
+        { name: 'addPenWidth', args: { pens: [ 15, 20, 30, 50 ] } },
+
+        // カラーパレット追加
+        { name: 'addColorPallet', args: { colors: 'ffffff dedfde 9ca2a5 292829 de3039 732c00 f7b29c ffdf4a 7bbead 295d52 8cc7ef 736dad' } },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -119,9 +128,70 @@
         var id_regexp = new RegExp( '/(' + ID_REGEXP + ')/$' );
         for( var i = 0; i < entries.length; ++i ) {
             var a = entries[i].firstChild;
-            if( a.href.match( id_regexp ) ) {
+            if( a.href && a.href.match( id_regexp ) ) {
                 a.innerHTML += ' (id:' + RegExp.$1 + ')';
             }
+        }
+    };
+
+    utils.disableSubmitButtonOnClick = function ( args ) {
+        var buttons = xpath( document.body, '//input[@type="submit"]' );
+        for( var i = 0; i < buttons.length; ++i ) {
+            buttons[i].addEventListener( 'click', function (e) {
+                this.disabled = true;
+            }, true );
+        }
+    };
+
+    function createColorPallet( color ) {
+        var a = document.createElement( 'a' );
+
+        a.href = "javascript:javascript:CanvasDrawer.instance.setProp('strokeStyle', '" + color + "'); hidePanel()";
+        a.style.color = color;
+        a.style.backgroundColor = color;
+        a.style.padding = '0 3px';
+        a.innerHTML = '&#x25a0;';
+
+        return a;
+    }
+
+    utils.addPenWidth = function ( args ) {
+        var pens = args.pens;
+        var widthDiv = xpath( document.body, '//div[@id="panel"]//p[@class="width"]' );
+        if( widthDiv.length != 1 ) return;
+        widthDiv = widthDiv[0];
+
+        for( var i = 0; i < pens.length; ++i ) {
+            var pen = pens[i];
+            var a   = document.createElement( 'a' );
+            a.href  = "javascript:CanvasDrawer.instance.setProp('lineWidth', " + pen + "); hidePanel()";
+            a.innerHTML = pen;
+            widthDiv.appendChild( a );
+            widthDiv.appendChild( document.createTextNode( '\n' ) );
+        }
+    };
+
+    utils.addColorPallet = function ( args ) {
+        var colors = args.colors.split( /\s+/ );
+        var colorPanel = xpath( document.body, '//div[@id="panel"]//p[@class="color"]' );
+        if( colorPanel.length != 1 ) return;
+        colorPanel = colorPanel[0];
+        colorPanel.appendChild( document.createElement( 'br' ) );
+
+        var add = document.createElement( 'a' );
+        add.innerHTML = 'add';
+        add.style.cursor = 'pointer';
+        add.addEventListener( 'click', function (e) {
+            var color = prompt( 'input color', '#' );
+            if( color == null || color == '' || color == '#' ) return;
+            colorPanel.appendChild( createColorPallet( color ) );
+        }, true );
+        colorPanel.appendChild( add );
+        colorPanel.appendChild( document.createTextNode( ' ' ) );
+
+        for( var i = 0; i < colors.length; ++i ) {
+            var color = '#' + colors[i];
+            colorPanel.appendChild( createColorPallet( color ) );
         }
     };
 
