@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.9.1
+// @version        0.0.10
 // ==/UserScript==
 (function() {
     // Select utility
@@ -18,6 +18,9 @@
 
         // ナビゲーション部の固定表示
         { name: 'fixedNavigation', args: {} },
+
+        // ナビゲーション部を拡張
+        { name: 'exNavigation', args: {} },
 
         // ニックネームの後にIDを表示
         { name: 'showID', args: {} },
@@ -79,28 +82,36 @@
         return hash;
     }
 
+    function getCanvas() {
+        return document.getElementById( 'canvas' );
+    }
+
+    function getCanvasContext() {
+        var canvas = getCanvas();
+        return canvas ? canvas.getContext( '2d' ): null;
+    }
+
     function createColorPallet( color ) {
-        var a = document.createElement( 'a' );
-
-        a.href = "javascript:javascript:CanvasDrawer.instance.setProp('strokeStyle', '" + color + "'); hidePanel()";
-        a.style.color = color;
-        a.style.backgroundColor = color;
-        a.style.padding = '0 3px';
-        a.innerHTML = '&#x25a0;';
-
+        var a = createElement( 'a', {
+            href: "javascript:CanvasDrawer.instance.setProp('strokeStyle', '" + color + "'); hidePanel()",
+            innerHTML: '&#x25a0;',
+        }, {
+            color: color,
+            backgroundColor: color,
+            padding: '0 3px',
+        } );
         return a;
     }
 
     function fillCanvas( top, left, width, height, color ) {
-        var canvas = document.getElementById( 'canvas' );
-        if( ! canvas ) return;
-        var ctx = canvas.getContext( '2d' );
+        var ctx = getCanvasContext();
+        if( ! ctx ) return;
         ctx.fillStyle = color;
         ctx.fillRect( top, left, width, height );
     }
-    
+
     function resizeCanvas( w, h ) {
-        var canvas = document.getElementById( 'canvas' );
+        var canvas = getCanvas();
         if( ! canvas ) return;
         canvas.width  = w;
         canvas.height = h;
@@ -118,10 +129,16 @@
         if( style == null ) style = {};
         if( event == null ) event = {};
 
-        for( var a in attr  ) element.setAttribute( a, attr[a] );
+        for( var a in attr  ) {
+            if( type == 'a' && a == 'innerHTML' ) {
+                element[a] = attr[a];
+            }else {
+                element.setAttribute( a, attr[a] );
+            }
+        }
         for( var s in style ) element.style[s] = style[s];
         for( var e in event ) element.addEventListener( e, event[e], true );
-        
+
         return element;
     }
 
@@ -133,15 +150,16 @@
 
         for( var i = 0; i < inputs.length; ++i ) {
             var input = inputs[i];
+            var tarea = createElement( 'textarea', {
+                name: 'body',
+            }, {
+                width:        '60%',
+                height:       '70px',
+                padding:      '3px',
+                display:      'block',
+                marginBottom: '5px',
+            } );
 
-            var tarea = document.createElement( 'textarea' );
-            tarea.name = 'body';
-            tarea.style.width        = '60%';
-            tarea.style.height       = '70px';
-            tarea.style.padding      = '3px';
-            tarea.style.display      = 'block';
-            tarea.style.marginBottom = '5px';
-            
             input.form.replaceChild( tarea, input );
         }
     };
@@ -173,6 +191,51 @@
         document.getElementsByTagName( 'body' )[0].style.paddingBottom = '20px';
     };
 
+    utils.exNavigation = function ( args ) {
+        var footer = document.getElementById( 'footer' );
+
+        if( location.href.match( /^(http:\/\/h2?\.hatena\.ne\.jp\/keyword\/[0-9]+)/ ) ) {
+            var roomURI = RegExp.$1;
+
+            footer.appendChild( document.createTextNode( ' ' ) );
+
+            footer.appendChild( createElement( 'img', {
+                src: 'http://ugomemo.hatena.ne.jp/images/emoji/e-4B0.gif',
+                alt: '[emoji:4B0]',
+                width: 16,
+                height: 16,
+                class: 'emoji emoji-google',
+            } ) );
+
+            footer.appendChild( createElement( 'a', {
+                href: roomURI,
+                innerHTML: 'ルーム更新',
+            } ) );
+        }
+
+        footer.appendChild( document.createTextNode( ' ' ) );
+        var form = createElement( 'form', {
+            action: '/user.search',
+            method: 'get',
+        }, {
+            display: 'inline',
+        } );
+
+        form.appendChild( createElement( 'input', {
+            type: 'text',
+            name: 'q',
+        }, {
+            width: '100px',
+        } ) );
+
+        form.appendChild( createElement( 'input', {
+            type: 'submit',
+            value: 'ルーム/ユーザー検索',
+        } ) );
+
+        footer.appendChild( form );
+    }
+
     utils.showID = function ( args ) {
         var entries = xpath( document.body, '//td[@class="entry"]' );
         var id_regexp = new RegExp( '/(' + ID_REGEXP + ')/$' );
@@ -201,9 +264,10 @@
 
         for( var i = 0; i < pens.length; ++i ) {
             var pen = pens[i];
-            var a   = document.createElement( 'a' );
-            a.href  = "javascript:CanvasDrawer.instance.setProp('lineWidth', " + pen + "); hidePanel()";
-            a.innerHTML = pen;
+            var a   = createElement( 'a', {
+                href: "javascript:CanvasDrawer.instance.setProp('lineWidth', " + pen + "); hidePanel()",
+                innerHTML: pen,
+            } );
             widthDiv.appendChild( a );
             widthDiv.appendChild( document.createTextNode( '\n' ) );
         }
@@ -214,17 +278,20 @@
         var colorPanel = xpath( document.body, '//div[@id="panel"]//p[@class="color"]' );
         if( colorPanel.length != 1 ) return;
         colorPanel = colorPanel[0];
-        colorPanel.appendChild( document.createElement( 'br' ) );
+        colorPanel.appendChild( createElement( 'br' ) );
 
-        var add = document.createElement( 'a' );
-        add.innerHTML = 'add';
-        add.style.cursor = 'pointer';
-        add.addEventListener( 'click', function (e) {
-            var color = prompt( 'input color', '#' );
-            if( color == null || color == '' || color == '#' ) return;
-            colorPanel.appendChild( createColorPallet( color ) );
-            colorPanel.appendChild( document.createTextNode( ' ' ) );
-        }, true );
+        var add = createElement( 'a', {
+            innerHTML: 'add',
+        }, {
+            cursor: 'pointer',
+        }, {
+            click: function (e) {
+                var color = prompt( 'input color', '#' );
+                if( color == null || color == '' || color == '#' ) return;
+                colorPanel.appendChild( createColorPallet( color ) );
+                colorPanel.appendChild( document.createTextNode( ' ' ) );
+            },
+        } );
         colorPanel.appendChild( add );
         colorPanel.appendChild( document.createTextNode( ' ' ) );
 
@@ -238,7 +305,7 @@
     utils.resizeCanvas = function ( args ) {
         resizeCanvas( args.defaultWidth, args.defaultHeight );
 
-        var panel       = document.getElementById( 'panel' );
+        var panel = document.getElementById( 'panel' );
         if( panel == null ) return;
 
         var resizer     = createElement( 'p' );
@@ -246,7 +313,6 @@
         var height      = args.defaultHeight;
         var runButton   = createElement( 'input', {
             type: 'button',
-            name: 'run',
             value: 'Resize',
             disabled: true,
         },{
@@ -258,7 +324,6 @@
         } );
         var inputWidth  = createElement( 'input', {
             type: 'text',
-            name: 'width',
             value: width,
         },{
             width: '30px',
@@ -273,7 +338,6 @@
         } );
         var inputHeight = createElement( 'input', {
             type: 'text',
-            name: 'height',
             value: height,
         },{
             width: '30px',
