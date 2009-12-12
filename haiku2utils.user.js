@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.10
+// @version        0.0.10.1
 // ==/UserScript==
 (function() {
     // Select utility
@@ -181,14 +181,19 @@
     };
 
     utils.fixedNavigation = function ( args ) {
+        var body   = document.getElementsByTagName( 'body' )[0];
         var footer = document.getElementById( 'footer' );
         footer.style.width    = '100%';
         footer.style.height   = '20px';
         footer.style.position = 'fixed';
         footer.style.bottom   = '-5px';
-        footer.style.backgroundColor = 'white';
+        footer.style.backgroundColor      = body.style.backgroundColor;
+        footer.style.backgroundImage      = body.style.backgroundImage;
+        footer.style.backgroundRepeat     = body.style.backgroundRepeat;
+        footer.style.backgroundPosition   = body.style.backgroundPosition;
+        footer.style.backgroundAttachment = body.style.backgroundAttachment;
 
-        document.getElementsByTagName( 'body' )[0].style.paddingBottom = '20px';
+        body.style.paddingBottom = '20px';
     };
 
     utils.exNavigation = function ( args ) {
