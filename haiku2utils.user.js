@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.10.1
+// @version        0.0.11
 // ==/UserScript==
 (function() {
     // Select utility
@@ -27,15 +27,6 @@
 
         // つぶやき投稿時等にSubmitボタンを無効にする
         { name: 'disableSubmitButtonOnClick', args: {} },
-
-        // ペンサイズ追加
-        { name: 'addPenWidth', args: { pens: [ 15, 20, 30, 50 ] } },
-
-        // カラーパレット追加
-        { name: 'addColorPallet', args: { colors: 'ffffff dedfde 9ca2a5 292829 de3039 732c00 f7b29c ffdf4a 7bbead 295d52 8cc7ef 736dad' } },
-
-        // canvasサイズ変更
-        { name: 'resizeCanvas', args: { defaultWidth: 240, defaultHeight: 170 } },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -82,47 +73,6 @@
         return hash;
     }
 
-    function getCanvas() {
-        return document.getElementById( 'canvas' );
-    }
-
-    function getCanvasContext() {
-        var canvas = getCanvas();
-        return canvas ? canvas.getContext( '2d' ): null;
-    }
-
-    function createColorPallet( color ) {
-        var a = createElement( 'a', {
-            href: "javascript:CanvasDrawer.instance.setProp('strokeStyle', '" + color + "'); hidePanel()",
-            innerHTML: '&#x25a0;',
-        }, {
-            color: color,
-            backgroundColor: color,
-            padding: '0 3px',
-        } );
-        return a;
-    }
-
-    function fillCanvas( top, left, width, height, color ) {
-        var ctx = getCanvasContext();
-        if( ! ctx ) return;
-        ctx.fillStyle = color;
-        ctx.fillRect( top, left, width, height );
-    }
-
-    function resizeCanvas( w, h ) {
-        var canvas = getCanvas();
-        if( ! canvas ) return;
-        canvas.width  = w;
-        canvas.height = h;
-        fillCanvas( 0, 0, w, h, '#ffffff' );
-
-        var panel = document.getElementById( 'panel' );
-        if( ! panel ) return;
-        panel.style.minWidth = '240px';
-        panel.style.width    = w + 'px';
-    }
-
     function createElement ( type, attr, style, event ) {
         var element = document.createElement( type );
         if( attr  == null ) attr  = {};
@@ -141,7 +91,6 @@
 
         return element;
     }
-
 
     var utils = {};
 
@@ -259,111 +208,6 @@
                 this.disabled = true;
             }, true );
         }
-    };
-
-    utils.addPenWidth = function ( args ) {
-        var pens = args.pens;
-        var widthDiv = xpath( document.body, '//div[@id="panel"]//p[@class="width"]' );
-        if( widthDiv.length != 1 ) return;
-        widthDiv = widthDiv[0];
-
-        for( var i = 0; i < pens.length; ++i ) {
-            var pen = pens[i];
-            var a   = createElement( 'a', {
-                href: "javascript:CanvasDrawer.instance.setProp('lineWidth', " + pen + "); hidePanel()",
-                innerHTML: pen,
-            } );
-            widthDiv.appendChild( a );
-            widthDiv.appendChild( document.createTextNode( '\n' ) );
-        }
-    };
-
-    utils.addColorPallet = function ( args ) {
-        var colors = args.colors.split( /\s+/ );
-        var colorPanel = xpath( document.body, '//div[@id="panel"]//p[@class="color"]' );
-        if( colorPanel.length != 1 ) return;
-        colorPanel = colorPanel[0];
-        colorPanel.appendChild( createElement( 'br' ) );
-
-        var add = createElement( 'a', {
-            innerHTML: 'add',
-        }, {
-            cursor: 'pointer',
-        }, {
-            click: function (e) {
-                var color = prompt( 'input color', '#' );
-                if( color == null || color == '' || color == '#' ) return;
-                colorPanel.appendChild( createColorPallet( color ) );
-                colorPanel.appendChild( document.createTextNode( ' ' ) );
-            },
-        } );
-        colorPanel.appendChild( add );
-        colorPanel.appendChild( document.createTextNode( ' ' ) );
-
-        for( var i = 0; i < colors.length; ++i ) {
-            var color = '#' + colors[i];
-            colorPanel.appendChild( createColorPallet( color ) );
-            colorPanel.appendChild( document.createTextNode( ' ' ) );
-        }
-    };
-
-    utils.resizeCanvas = function ( args ) {
-        resizeCanvas( args.defaultWidth, args.defaultHeight );
-
-        var panel = document.getElementById( 'panel' );
-        if( panel == null ) return;
-
-        var resizer     = createElement( 'p' );
-        var width       = args.defaultWidth;
-        var height      = args.defaultHeight;
-        var runButton   = createElement( 'input', {
-            type: 'button',
-            value: 'Resize',
-            disabled: true,
-        },{
-        },{
-            click: function (e) {
-                resizeCanvas( width, height );
-                this.disabled = true;
-            },
-        } );
-        var inputWidth  = createElement( 'input', {
-            type: 'text',
-            value: width,
-        },{
-            width: '30px',
-        },{
-            focus: function (e) { this.select(); },
-            change: function (e) {
-                if( this.value.match( /^([0-9]+)$/ ) ) {
-                    width = RegExp.$1;
-                    runButton.disabled = false;
-                }
-            },
-        } );
-        var inputHeight = createElement( 'input', {
-            type: 'text',
-            value: height,
-        },{
-            width: '30px',
-        },{
-            focus: function (e) { this.select(); },
-            change: function (e) {
-                if( this.value.match( /^([0-9]+)$/ ) ) {
-                    height = RegExp.$1;
-                    runButton.disabled = false;
-                }
-            },
-        } );
-
-        resizer.appendChild( document.createTextNode( 'W:' ) );
-        resizer.appendChild( inputWidth );
-        resizer.appendChild( document.createTextNode( 'px\nH:' ) );
-        resizer.appendChild( inputHeight );
-        resizer.appendChild( document.createTextNode( 'px\n' ) );
-        resizer.appendChild( runButton );
-
-        panel.appendChild( resizer );
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
