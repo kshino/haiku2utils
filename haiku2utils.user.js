@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.11
+// @version        0.0.12
 // ==/UserScript==
 (function() {
     // Select utility
@@ -27,6 +27,9 @@
 
         // つぶやき投稿時等にSubmitボタンを無効にする
         { name: 'disableSubmitButtonOnClick', args: {} },
+
+        // ルームつぶやきへのReplyで、ルームへReplyするかしないかを選択可にする
+        { name: 'replySelecter', args: {} },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -92,6 +95,8 @@
         return element;
     }
 
+/////////////////////////////////////////////////////////////
+
     var utils = {};
 
     utils.wideTsubuyaki = function ( args ) {
@@ -115,17 +120,27 @@
 
     utils.wideImage = function ( args ) {
         var imgs = xpath( document.body, '//td[@class="entry"]//img[@alt="photo"]' );
+        var exts = { jpg: 'png', png: 'gif', gif: null, };
+        var onerror = function (e) {
+            if( this.src.match( /^(.+\.)(jpg|png|gif)$/ ) ) {
+                this.src = RegExp.$1 + exts[ RegExp.$2 ];
+            }
+        };
+
         for( var i = 0; i < imgs.length; ++i ) {
-            var img = imgs[i];
+            var img    = imgs[i];
             var params = parseQueryParam( img.src );
             var url    = params == null ? img.src: params.url;
-//            if( url.match( /^(http:\/\/(?:img\.)?f\.hatena\.ne\.jp\/images\/.+)_\d+(\.(?:jpg|gif|png))/ ) ) {
-//                url = RegExp.$1 + RegExp.$2;
-//            }
-            img.src = url;
+
+            if( url.match( /^(http:\/\/(?:img\.)?f\.hatena\.ne\.jp\/images\/.+)_\d+(\.(?:jpg|gif|png))/ ) ) {
+                url = RegExp.$1 + RegExp.$2;
+                img.addEventListener( 'error', onerror, true );
+            }
+
             img.style.maxWidth  = args.maxSize;
             img.style.maxHeight = args.maxSize;
             if( args.bgcolor ) img.style.backgroundColor = args.bgcolor;
+            img.src = url;
         }
     };
 
@@ -208,6 +223,9 @@
                 this.disabled = true;
             }, true );
         }
+    };
+
+    utils.replySelecter = function ( args ) {
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
