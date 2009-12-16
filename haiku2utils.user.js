@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.12
+// @version        0.0.12.1
 // ==/UserScript==
 (function() {
     // Select utility
@@ -27,9 +27,6 @@
 
         // つぶやき投稿時等にSubmitボタンを無効にする
         { name: 'disableSubmitButtonOnClick', args: {} },
-
-        // ルームつぶやきへのReplyで、ルームへReplyするかしないかを選択可にする
-        { name: 'replySelecter', args: {} },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -223,9 +220,6 @@
                 this.disabled = true;
             }, true );
         }
-    };
-
-    utils.replySelecter = function ( args ) {
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
