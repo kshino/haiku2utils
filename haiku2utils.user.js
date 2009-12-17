@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.12.1
+// @version        0.0.13
 // ==/UserScript==
 (function() {
     // Select utility
@@ -27,6 +27,15 @@
 
         // つぶやき投稿時等にSubmitボタンを無効にする
         { name: 'disableSubmitButtonOnClick', args: {} },
+
+        // 画像へのリンクをPC用URLにする
+        { name: 'imageLinkToPCURL', args: {} },
+
+        // bodyのstyle指定
+        { name: 'setBodyStyle', args: { fontSize: '90%' } },
+
+        // ルームつぶやきへのReplyで、ルームへ投稿するかしないかを選択可にする
+        { name: 'replySelecter', args: {} },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -145,7 +154,7 @@
         var body   = document.getElementsByTagName( 'body' )[0];
         var footer = document.getElementById( 'footer' );
         footer.style.width    = '100%';
-        footer.style.height   = '20px';
+        footer.style.height   = '25px';
         footer.style.position = 'fixed';
         footer.style.bottom   = '-5px';
         footer.style.backgroundColor      = body.style.backgroundColor;
@@ -154,7 +163,7 @@
         footer.style.backgroundPosition   = body.style.backgroundPosition;
         footer.style.backgroundAttachment = body.style.backgroundAttachment;
 
-        body.style.paddingBottom = '20px';
+        body.style.paddingBottom = '25px';
     };
 
     utils.exNavigation = function ( args ) {
@@ -220,6 +229,78 @@
                 this.disabled = true;
             }, true );
         }
+    };
+
+    utils.imageLinkToPCURL = function ( args ) {
+        var links = xpath( document.body, '//td[@class="entry"]//a' );
+        var fotolifeRegExp = new RegExp(
+            '^http:\\/\\/img\\.f\\.hatena\\.ne\\.jp\\/images\\/fotolife\\/[a-zA-Z]\\/('
+            + ID_REGEXP +
+            ')\/\\d+\/(\\d+)\.(?:jpg|png|gif)$'
+        );
+
+        for( var i = 0; i < links.length; ++i ) {
+            var link = links[i];
+            if( link.href.match( /^(http:\/\/f\.hatena\.ne\.jp\/)mobile\/(.+)/ ) ) {
+                link.href = RegExp.$1 + RegExp.$2;
+                continue;
+            }
+
+            if( link.href.match( /^http:\/\/mgw\.hatena\.ne\.jp\// ) ) {
+                var params = parseQueryParam( link.href );
+                if( ! params.url ) continue;
+
+// http://img.f.hatena.ne.jp/images/fotolife/m/mayu-h/20091217/20091217080700.jpg
+                if( params.url.match( fotolifeRegExp ) ) {
+                    params.url = 'http://f.hatena.ne.jp/' + RegExp.$1 + '/' + RegExp.$2;
+                }
+                link.href = params.url;
+                continue;
+            }
+        }
+    };
+
+    utils.setBodyStyle = function ( args ) {
+        var body = document.getElementsByTagName( 'body' )[0];
+        for( var k in args ) {
+            body.style[k] = args[k];
+        }
+    };
+
+    utils.replySelecter = function ( args ) {
+        var fromKeyword = xpath( document.body, '//form[@action="/"]//input[@name="from_keyword"]' );
+        if( fromKeyword.length != 1 ) return;
+        fromKeyword = fromKeyword[0];
+
+        var entries = xpath( document.body, '//td[@class="entry"]' );
+        if( entries.length == 0 ) return;
+        
+        var entry = entries[0];
+        var firstLine = entry.innerHTML.split( '<br>', 2 )[0];
+
+        if( ! firstLine.match( /<a\s+href="\/keyword\/\d+"/ ) ) return;
+
+        function createRadio( name, value, text, defaultValue ) {
+            var id    = name + '_' + value;
+            var label = createElement( 'label', { 'for': id } );
+            var input = createElement( 'input', {
+                'type': 'radio',
+                'id': id,
+                'name': name,
+                'value': value,
+            } );
+            if( value == defaultValue ) input.setAttribute( 'checked', 'checked' );
+            label.appendChild( input );
+            label.appendChild( document.createTextNode( text ) );
+            return label;
+        }
+
+        var span = createElement( 'span' );
+        span.appendChild( createRadio( 'from_keyword', '1', 'ルームに投稿する', fromKeyword.value ) );
+        span.appendChild( document.createTextNode( ' ' ) );
+        span.appendChild( createRadio( 'from_keyword', '', 'ルームに投稿しない', fromKeyword.value ) );
+
+        fromKeyword.form.replaceChild( span, fromKeyword );
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
