@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.13
+// @version        0.0.13.1
 // ==/UserScript==
 (function() {
     // Select utility
@@ -250,7 +250,6 @@
                 var params = parseQueryParam( link.href );
                 if( ! params.url ) continue;
 
-// http://img.f.hatena.ne.jp/images/fotolife/m/mayu-h/20091217/20091217080700.jpg
                 if( params.url.match( fotolifeRegExp ) ) {
                     params.url = 'http://f.hatena.ne.jp/' + RegExp.$1 + '/' + RegExp.$2;
                 }
