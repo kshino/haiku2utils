@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.13.1
+// @version        0.0.14
 // ==/UserScript==
 (function() {
     // Select utility
@@ -36,6 +36,12 @@
 
         // ルームつぶやきへのReplyで、ルームへ投稿するかしないかを選択可にする
         { name: 'replySelecter', args: {} },
+
+        // 手書きとテキストを同時に投稿できるようにする
+        { name: 'textWithCanvas', args: {} },
+
+        // つっつきrkmの修正
+        { name: 'fixPokeRKM', args: {} },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -300,6 +306,64 @@
         span.appendChild( createRadio( 'from_keyword', '', 'ルームに投稿しない', fromKeyword.value ) );
 
         fromKeyword.form.replaceChild( span, fromKeyword );
+    };
+
+    utils.textWithCanvas = function ( args ) {
+        if( unsafeWindow.Hatena.Haiku == undefined ) return;
+        if( unsafeWindow.Hatena.Haiku.Canvas == undefined ) return;
+
+        var canvasMain = document.getElementById( 'canvas-main' );
+        if( ! canvasMain ) return;
+
+        var canvasClass = unsafeWindow.Hatena.Haiku.Canvas;
+        var postDrawing = canvasClass.postDrawing;
+        canvasClass.postDrawing = function (uri) {
+            var post = document.getElementById( 'h2u_body_post' ).value;
+            var body = document.getElementById( 'h2u_body' );
+
+            if( post != '' ) post = '\n' + post;
+            
+            body.value = uri + post;
+            body.form.submit();
+        };
+
+        var form = createElement( 'form', {
+            action: canvasClass.endPoint,
+            method: 'post',
+        } );
+
+        form.appendChild( createElement( 'input', {
+            type: 'hidden',
+            name: 'rkm',
+            value: unsafeWindow.Hatena.Visitor.RKM,
+        } ) );
+        form.appendChild( createElement( 'input', {
+            type: 'hidden',
+            name: 'body',
+            id: 'h2u_body',
+            value: '',
+        } ) );
+        form.appendChild( createElement( 'textarea', {
+            'id': 'h2u_body_post',
+        }, {
+            width:        '60%',
+            height:       '70px',
+            padding:      '3px',
+            display:      'block',
+            margin: '20px auto',
+        } ) );
+
+        canvasMain.appendChild( form );
+    };
+
+    utils.fixPokeRKM = function ( args ) {
+        var links  = xpath( document.body, '//a[@accesskey="5"]' );
+        var regexp = new RegExp( '^(.+/' + ID_REGEXP + '/poke\\?rkm=)(.+)', 'g' );
+        for( var i = 0; i < links.length; ++i ) {
+            var link = links[i];
+            if( ! link.href || ! link.href.match( regexp ) ) continue;
+            link.href = RegExp.$1 + RegExp.$2.replace( /\+/g, '%2b' );
+        }
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
