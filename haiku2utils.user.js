@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.14
+// @version        0.0.15
 // ==/UserScript==
 (function() {
     // Select utility
@@ -39,9 +39,6 @@
 
         // 手書きとテキストを同時に投稿できるようにする
         { name: 'textWithCanvas', args: {} },
-
-        // つっつきrkmの修正
-        { name: 'fixPokeRKM', args: {} },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -354,16 +351,6 @@
         } ) );
 
         canvasMain.appendChild( form );
-    };
-
-    utils.fixPokeRKM = function ( args ) {
-        var links  = xpath( document.body, '//a[@accesskey="5"]' );
-        var regexp = new RegExp( '^(.+/' + ID_REGEXP + '/poke\\?rkm=)(.+)', 'g' );
-        for( var i = 0; i < links.length; ++i ) {
-            var link = links[i];
-            if( ! link.href || ! link.href.match( regexp ) ) continue;
-            link.href = RegExp.$1 + RegExp.$2.replace( /\+/g, '%2b' );
-        }
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
