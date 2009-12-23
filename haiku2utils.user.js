@@ -2,9 +2,9 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.15
+// @version        0.0.15.1
 // ==/UserScript==
-(function() {
+(function( uWindow ) {
     // Select utility
     var runUtils = [
         // つぶやき欄の拡張
@@ -229,7 +229,9 @@
         var buttons = xpath( document.body, '//input[@type="submit"]' );
         for( var i = 0; i < buttons.length; ++i ) {
             buttons[i].addEventListener( 'click', function (e) {
+                e.preventDefault();
                 this.disabled = true;
+                this.form.submit();
             }, true );
         }
     };
@@ -306,13 +308,12 @@
     };
 
     utils.textWithCanvas = function ( args ) {
-        if( unsafeWindow.Hatena.Haiku == undefined ) return;
-        if( unsafeWindow.Hatena.Haiku.Canvas == undefined ) return;
+        if( ! uWindow || ! uWindow.Hatena || ! uWindow.Hatena.Haiku || ! uWindow.Hatena.Haiku.Canvas || ! uWindow.Hatena.Visitor ) return;
 
         var canvasMain = document.getElementById( 'canvas-main' );
         if( ! canvasMain ) return;
 
-        var canvasClass = unsafeWindow.Hatena.Haiku.Canvas;
+        var canvasClass = uWindow.Hatena.Haiku.Canvas;
         var postDrawing = canvasClass.postDrawing;
         canvasClass.postDrawing = function (uri) {
             var post = document.getElementById( 'h2u_body_post' ).value;
@@ -332,22 +333,22 @@
         form.appendChild( createElement( 'input', {
             type: 'hidden',
             name: 'rkm',
-            value: unsafeWindow.Hatena.Visitor.RKM,
+            value: uWindow.Hatena.Visitor.RKM,
         } ) );
         form.appendChild( createElement( 'input', {
-            type: 'hidden',
-            name: 'body',
-            id: 'h2u_body',
+            type:  'hidden',
+            name:  'body',
+            id:    'h2u_body',
             value: '',
         } ) );
         form.appendChild( createElement( 'textarea', {
             'id': 'h2u_body_post',
         }, {
-            width:        '60%',
-            height:       '70px',
-            padding:      '3px',
-            display:      'block',
-            margin: '20px auto',
+            width:   '60%',
+            height:  '70px',
+            padding: '3px',
+            display: 'block',
+            margin:  '20px auto',
         } ) );
 
         canvasMain.appendChild( form );
@@ -357,4 +358,5 @@
         var target = runUtils[i];
         utils[ target.name ]( target.args );
     }
-})();
+
+})( this.unsafeWindow || window );
