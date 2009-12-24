@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.15.1
+// @version        0.0.16
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -39,6 +39,9 @@
 
         // 手書きとテキストを同時に投稿できるようにする
         { name: 'textWithCanvas', args: {} },
+
+        // うごメモのインラインプレーヤー化
+        { name: 'ugomemoPlayer', args: {} },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -352,6 +355,42 @@
         } ) );
 
         canvasMain.appendChild( form );
+    };
+
+    utils.ugomemoPlayer = function ( args ) {
+        var divs   = xpath( document.body, '//td[@class="entry"]//div' );
+        var regexp = new RegExp(
+            'href="http://ugomemo\\.hatena\\.ne\\.jp/(?:mobile/)?'
+            + '([0-9A-F]+)@DSi/movie/([0-9A-F]+_[0-9A-F]+_[0-9A-F]+)"'
+        );
+        for( var i = 0; i < divs.length; ++i ) {
+            var div = divs[i];
+            if( ! div.innerHTML.match( regexp ) ) continue;
+            var did  = RegExp.$1;
+            var file = RegExp.$2;
+
+            var newDiv  = createElement( 'div', {}, {
+                textAlign: 'center',
+            } );
+
+            var ugomemo = createElement( 'object', {
+                data:   'http://ugomemo.hatena.ne.jp/js/ugoplayer_s.swf',
+                type:   'application/x-shockwave-flash',
+                width:  279,
+                height: 240,
+            } );
+            ugomemo.appendChild( createElement( 'param', {
+                name:  'movie',
+                value: 'http://ugomemo.hatena.ne.jp/js/ugoplayer_s.swf',
+            } ) );
+            ugomemo.appendChild( createElement( 'param', {
+                name:  'FlashVars',
+                value: 'did=' + did + '&file=' + file,
+            } ) );
+
+            newDiv.appendChild( ugomemo );
+            div.parentNode.replaceChild( newDiv, div );
+        }
     };
 
     for( var i = 0; i < runUtils.length; ++i ) {
