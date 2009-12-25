@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.16
+// @version        0.0.16.1
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -34,7 +34,7 @@
         // bodyのstyle指定
         { name: 'setBodyStyle', args: { fontSize: '90%' } },
 
-        // ルームつぶやきへのReplyで、ルームへ投稿するかしないかを選択可にする
+        // ひろばつぶやきへのReplyで、ひろばへ投稿するかしないかを選択可にする
         { name: 'replySelecter', args: {} },
 
         // 手書きとテキストを同時に投稿できるようにする
@@ -190,7 +190,7 @@
 
             footer.appendChild( createElement( 'a', {
                 href: roomURI,
-                innerHTML: 'ルーム更新',
+                innerHTML: 'ひろば更新',
             } ) );
         }
 
@@ -211,7 +211,7 @@
 
         form.appendChild( createElement( 'input', {
             type: 'submit',
-            value: 'ルーム/ユーザー検索',
+            value: 'ひろば/ユーザー検索',
         } ) );
 
         footer.appendChild( form );
@@ -303,9 +303,9 @@
         }
 
         var span = createElement( 'span' );
-        span.appendChild( createRadio( 'from_keyword', '1', 'ルームに投稿する', fromKeyword.value ) );
+        span.appendChild( createRadio( 'from_keyword', '1', 'ひろばに投稿する', fromKeyword.value ) );
         span.appendChild( document.createTextNode( ' ' ) );
-        span.appendChild( createRadio( 'from_keyword', '', 'ルームに投稿しない', fromKeyword.value ) );
+        span.appendChild( createRadio( 'from_keyword', '', 'ひろばに投稿しない', fromKeyword.value ) );
 
         fromKeyword.form.replaceChild( span, fromKeyword );
     };
