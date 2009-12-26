@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.17
+// @version        0.0.17.1
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -427,8 +427,16 @@
         if( ! style ) style = {};
         if( ! event ) event = {};
 
+        var src;
+        var type = code.charAt( 0 );
+        switch( type ) {
+            case 'h': src = 'dsi/l/U+FA7' + code.slice( 1 ); break;
+            case 'n': src = 'dsi/l/U+E0'  + code.slice( 1 ); break;
+            default:  src = 'emoji/e-' + code; break;
+        }
+
         return img = createElement( 'img', {
-            src: 'http://ugomemo.hatena.ne.jp/images/emoji/e-' + code + '.gif',
+            'src':  'http://ugomemo.hatena.ne.jp/images/' + src + '.gif',
             width:  16,
             height: 16,
             alt:    '[emoji:' + code + ']',
@@ -510,6 +518,9 @@
             'B30', 'B31', 'B36', 'B48', 'B55', 'B56', 'B57', 'B58', 'B59', 'B5B',
             'B5C', 'B5D', 'B60', 'B61', 'B81', 'B82', 'B83', 'B84', 'B85', 'B93',
             'B94', 'B95', 'B96', 'B97', 'E10', 'E11', 'E12', 'E13', 'E14', 'E15',
+            'n00', 'n01', 'n02', 'n03', 'n04', 'n05', 'n06', 'n07', 'n08', 'n09',
+            'n0A', 'n0B', 'n0C', 'n0D', 'n0E', 'n0F', 'n10', 'n11', 'n12', 'n13',
+            'n15', 'n16', 'n17', 'n18', 'n19', 'n1A', 'n1B', 'n1C', 'n28', 'h00',
         ];
     }
 
