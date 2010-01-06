@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.17.2
+// @version        0.0.17.3
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -223,7 +223,7 @@
 
         form.appendChild( createElement( 'input', {
             type: 'submit',
-            value: 'ひろば/ユーザー検索',
+            value: 'ユーザー検索',
         } ) );
 
         footer.appendChild( form );
