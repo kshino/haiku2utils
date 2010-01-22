@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.18.1
+// @version        0.0.18.2
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -196,7 +196,7 @@
             var footer = $( 'footer' );
 
             function appendFooterLink( emoji, url, title ) {
-                footer.appendChild( document.createTextNode( ' ' ) );
+                footer.appendChild( document.createTextNode( '　' ) );
                 footer.appendChild( createElement( 'img', {
                         src: 'http://ugomemo.hatena.ne.jp/images/emoji/e-' + emoji + '.gif',
                         alt: '[emoji:' + emoji + ']',
@@ -210,6 +210,7 @@
                 } ) );
             }
 
+            appendFooterLink( 'AF4', '/?flid=top', 'すべてトップ' );
             appendFooterLink( '553', '/location', '地名イマココ' );
             appendFooterLink( 'B22', '/keyword.search', 'ひろば一覧' );
 
