@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.18
+// @version        0.0.18.1
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -136,7 +136,7 @@
                     height:  '70px',
                     padding: '3px',
                 } ) );
-
+                input.parentNode.style.width = '100%';
                 input.parentNode.replaceChild( div, input );
             }
         },
