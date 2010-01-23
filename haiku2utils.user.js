@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.18.2
+// @version        0.0.19
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -42,6 +42,9 @@
 
         // つぶやきToolbar表示
         { name: 'tsubuyakiToolbar', args: {} },
+
+        // 返信でグループ選択が機能しない問題に対応
+        { name: 'fixReplyGroupSelect', args: {} },
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -428,6 +431,19 @@
                 tbox.parentNode.insertBefore( toolbar, tbox );
                 new EmojiTable( toolbar, tbox );
             }
+        },
+    };
+
+    utils.fixReplyGroupSelect = {
+        initOnly: true,
+        func: function ( args ) {
+            var select = xpath( document.body, '//select[@name="friend_list_id"]' );
+            if( select.length != 1 ) return;
+
+            var hidden = xpath( select[0].form, '//input[@name="friend_list_id"]' );
+            if( hidden.length != 1 ) return;
+
+            hidden[0].parentNode.removeChild( hidden[0] );
         },
     };
 
