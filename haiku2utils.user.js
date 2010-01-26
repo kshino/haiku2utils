@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.19.1
+// @version        0.0.19.2
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -11,7 +11,7 @@
         { name: 'wideTsubuyaki', args: {} },
 
         // 画像を大きく表示
-        { name: 'wideImage', args: { maxSize: '300px', bgcolor: 'white' } },
+        { name: 'wideImage', args: { maxSize: '250px', bgcolor: 'white' } },
         // 画像の透過をそのままにしておく場合は、上記からbgcolorの指定を消して、
         // { name: 'wideImage', args: { maxSize: '300px' } },
         // のようにしてください
@@ -125,7 +125,7 @@
                 var div   = createElement( 'div', {
                     class: 'h2u_bodyBox',
                 }, {
-                    width: '60%',
+                    width: '80%',
                     marginBottom: '5px',
                 } );
                 div.appendChild( createElement( 'textarea', {
@@ -179,6 +179,7 @@
             footer.style.width    = '100%';
             footer.style.height   = '25px';
             footer.style.position = 'fixed';
+            footer.style.left     = '0';
             footer.style.bottom   = '-5px';
             footer.style.backgroundColor      = body.style.backgroundColor;
             footer.style.backgroundImage      = body.style.backgroundImage;
@@ -308,6 +309,8 @@
             for( var k in args ) {
                 body.style[k] = args[k];
             }
+//            var container = document.getElementById( 'container' );
+//            container.style.width = '100%';
         },
     };
 
@@ -340,7 +343,7 @@
             var bodyBox = createElement( 'div', {
                 class: 'h2u_bodyBox',
             }, {
-                width: '60%',
+                width: '80%',
                 margin: '30px auto 5px',
             } );
 
