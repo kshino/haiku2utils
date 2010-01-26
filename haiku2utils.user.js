@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.20
+// @version        0.0.20.1
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -453,11 +453,11 @@
                 function(){ GM_deleteValue( 'containerWidth' ) }
             );
             GM_registerMenuCommand(
-                'Haiku2Utils - 表示設定(600px)',
+                'Haiku2Utils - 表示幅設定(600px)',
                 function(){ GM_setValue( 'containerWidth', '600px' ) }
             );
             GM_registerMenuCommand(
-                'Haiku2Utils - 表示設定(window size)',
+                'Haiku2Utils - 表示幅設定(window size)',
                 function(){ GM_setValue( 'containerWidth', '100%' ) }
             );
         },
