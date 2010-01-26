@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.19.4
+// @version        0.0.20
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -42,6 +42,13 @@
 
         // つぶやきToolbar表示
         { name: 'tsubuyakiToolbar', args: {} },
+
+        // 表示幅の調整
+        { name: 'setContainerWidth', args: { width: null, } },
+        // Google Chromeではメニューからの選択ができません。
+        // 代わりに、上記の{ width: null }を
+        // { width: '600px' } や
+        // { width: '100%' } に書き換えることで、表示幅を指定できます。
     ];
 
     const ID_REGEXP = '[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]';
@@ -130,7 +137,6 @@
                 } );
                 div.appendChild( createElement( 'textarea', {
                     name: 'body',
-                    id:   'h2u_body',
                 }, {
                     width:   '100%',
                     height:  '70px',
@@ -312,8 +318,6 @@
             for( var k in args ) {
                 body.style[k] = args[k];
             }
-//            var container = document.getElementById( 'container' );
-//            container.style.width = '100%';
         },
     };
 
@@ -350,9 +354,7 @@
                 margin: '30px auto 5px',
             } );
 
-            var bodyPost = createElement( 'textarea', {
-                id: 'h2u_body',
-            }, {
+            var bodyPost = createElement( 'textarea', {}, {
                 width:   '100%',
                 height:  '70px',
                 padding: '3px',
@@ -418,12 +420,10 @@
     utils.tsubuyakiToolbar = {
         initOnly: true,
         func: function ( args ) {
-            var textbox = document.getElementsByClassName( 'h2u_body' );
+            var textbox = document.getElementsByTagName( 'textarea' );
             if( textbox.length == 0 ) textbox = document.getElementsByName( 'body' );
 
-            var toolbar = createElement( 'div', {
-                id: 'h2u_toolbar',
-            }, {
+            var toolbar = createElement( 'div', {}, {
                 textAlign: 'left',
             } );
 
@@ -434,6 +434,32 @@
                 tbox.parentNode.insertBefore( toolbar, tbox );
                 new EmojiTable( toolbar, tbox );
             }
+        },
+    };
+
+    utils.setContainerWidth = {
+        initOnly: true,
+        func: function ( args ) {
+            if( args.width ) {
+                $('container').style.width = args.width;
+                return;
+            }
+
+            var w = GM_getValue( 'containerWidth' );
+            if( w ) $('container').style.width = w;
+
+            GM_registerMenuCommand(
+                'Haiku2Utils - 表示幅設定(default)',
+                function(){ GM_deleteValue( 'containerWidth' ) }
+            );
+            GM_registerMenuCommand(
+                'Haiku2Utils - 表示設定(600px)',
+                function(){ GM_setValue( 'containerWidth', '600px' ) }
+            );
+            GM_registerMenuCommand(
+                'Haiku2Utils - 表示設定(window size)',
+                function(){ GM_setValue( 'containerWidth', '100%' ) }
+            );
         },
     };
 
