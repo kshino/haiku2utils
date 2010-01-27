@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.20.1
+// @version        0.0.20.2
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -446,7 +446,11 @@
             }
 
             var w = GM_getValue( 'containerWidth' );
-            if( w ) $('container').style.width = w;
+            if( w ) {
+                var s = $('container').style;
+                s.width = w;
+                if( w == '100%' ) s.border = 'none';
+            }
 
             GM_registerMenuCommand(
                 'Haiku2Utils - 表示幅設定(default)',
