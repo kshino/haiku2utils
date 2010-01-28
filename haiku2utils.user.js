@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.20.2
+// @version        0.0.20.3
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -440,8 +440,11 @@
     utils.setContainerWidth = {
         initOnly: true,
         func: function ( args ) {
+            var s = $('container').style;
+
             if( args.width ) {
-                $('container').style.width = args.width;
+                s.width = args.width;
+                if( args.width == '100%' ) s.border = 'none';
                 return;
             }
 
