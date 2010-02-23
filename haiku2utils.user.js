@@ -2,7 +2,7 @@
 // @name           Haiku2Utils
 // @namespace      http://www.scrapcode.net/
 // @include        http://h2.hatena.ne.jp/*
-// @version        0.0.20.3
+// @version        0.0.20.4
 // ==/UserScript==
 (function( uWindow ) {
     // Select utility
@@ -222,11 +222,6 @@
 
             appendFooterLink( 'AF4', '/?flid=top', 'すべてトップ' );
             appendFooterLink( '553', '/location', '地名イマココ' );
-            appendFooterLink( 'B22', '/keyword.search', 'ひろば一覧' );
-
-            if( location.href.match( /^(http:\/\/h2?\.hatena\.ne\.jp\/keyword\/[0-9]+)/ ) ) {
-                appendFooterLink( '4B0', RegExp.$1, 'ひろば更新' );
-            }
 
             footer.appendChild( document.createTextNode( ' ' ) );
             var form = createElement( 'form', {
